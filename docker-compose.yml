@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+  universityschedulesystem:
+    image: ${DOCKER_REGISTRY-}universityschedulesystem
+    build:
+      context: .
+      dockerfile: UniversityScheduleSystem/Dockerfile
+    depends_on:
+      - sqlserverService
+    networks:
+      - universchedulesyst
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+    ports:
+      - "80"
+      - "443"
+
+  sqlserverService:
+     image: mcr.microsoft.com/mssql/server:latest
+     hostname: sqlserverService
+     container_name: sqlserverService
+     
+     environment:
+       ACCEPT_EULA: Y
+       SA_PASSWORD: Password1
+     volumes:
+       - ./data/mssql:/var/opt/mssql3
+     ports:
+       - 1450:1433
+     networks:
+       - universchedulesyst
+
+networks:
+   universchedulesyst:
+     driver: bridge
