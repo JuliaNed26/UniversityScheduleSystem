@@ -106,6 +106,10 @@ namespace UniversityScheduleSystem.Controllers
           {
               return Problem("Entity set 'ScheduleSystemAPIContext.Cities'  is null.");
           }
+          if(_context.Regions.Find(city.RegionId) == null)
+          {
+              return Problem("Don't have such region");
+          }
 
             var newCity = new City()
             {

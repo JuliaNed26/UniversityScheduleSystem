@@ -89,7 +89,20 @@ namespace UniversityScheduleSystem.Controllers
           {
               return Problem("Entity set 'ScheduleSystemAPIContext.Universities'  is null.");
           }
-            _context.Universities.Add(university);
+
+            if (_context.Cities.Find(university.CityId) == null)
+            {
+                return Problem("Don't have such city");
+            }
+
+            var newUniversity = new University()
+            {
+                Name = university.Name,
+                CityId = university.CityId,
+                City = _context.Cities.Find(university.CityId)
+            };
+
+            _context.Universities.Add(newUniversity);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetUniversity", new { id = university.Id }, university);
