@@ -1,7 +1,13 @@
-﻿namespace UniversityScheduleSystem.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace UniversityScheduleSystem.Models
 {
     public class Teaching
     {
+        public Teaching()
+        {
+            Lessons = new List<Lesson>();
+        }
         public int Id { get; set; }
         public int TeacherId { get; set; }
         public Teacher Teacher { get; set; }

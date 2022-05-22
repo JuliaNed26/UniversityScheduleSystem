@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +24,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Faculty>>> GetFaculties()
         {
+          if (_context.Faculties == null)
+          {
+              return NotFound();
+          }
             return await _context.Faculties.ToListAsync();
         }
 
@@ -32,6 +35,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Faculty>> GetFaculty(int id)
         {
+          if (_context.Faculties == null)
+          {
+              return NotFound();
+          }
             var faculty = await _context.Faculties.FindAsync(id);
 
             if (faculty == null)
@@ -78,6 +85,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Faculty>> PostFaculty(Faculty faculty)
         {
+          if (_context.Faculties == null)
+          {
+              return Problem("Entity set 'ScheduleSystemAPIContext.Faculties'  is null.");
+          }
             _context.Faculties.Add(faculty);
             await _context.SaveChangesAsync();
 
@@ -88,6 +99,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteFaculty(int id)
         {
+            if (_context.Faculties == null)
+            {
+                return NotFound();
+            }
             var faculty = await _context.Faculties.FindAsync(id);
             if (faculty == null)
             {
@@ -102,7 +117,7 @@ namespace UniversityScheduleSystem.Controllers
 
         private bool FacultyExists(int id)
         {
-            return _context.Faculties.Any(e => e.Id == id);
+            return (_context.Faculties?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

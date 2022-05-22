@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,16 +22,24 @@ namespace UniversityScheduleSystem.Controllers
 
         // GET: api/Disciplines
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Discipline>>> GetDiscipline()
+        public async Task<ActionResult<IEnumerable<Discipline>>> GetDisciplines()
         {
-            return await _context.Discipline.ToListAsync();
+          if (_context.Disciplines == null)
+          {
+              return NotFound();
+          }
+            return await _context.Disciplines.ToListAsync();
         }
 
         // GET: api/Disciplines/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Discipline>> GetDiscipline(int id)
         {
-            var discipline = await _context.Discipline.FindAsync(id);
+          if (_context.Disciplines == null)
+          {
+              return NotFound();
+          }
+            var discipline = await _context.Disciplines.FindAsync(id);
 
             if (discipline == null)
             {
@@ -78,7 +85,11 @@ namespace UniversityScheduleSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Discipline>> PostDiscipline(Discipline discipline)
         {
-            _context.Discipline.Add(discipline);
+          if (_context.Disciplines == null)
+          {
+              return Problem("Entity set 'ScheduleSystemAPIContext.Disciplines'  is null.");
+          }
+            _context.Disciplines.Add(discipline);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetDiscipline", new { id = discipline.Id }, discipline);
@@ -88,13 +99,17 @@ namespace UniversityScheduleSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDiscipline(int id)
         {
-            var discipline = await _context.Discipline.FindAsync(id);
+            if (_context.Disciplines == null)
+            {
+                return NotFound();
+            }
+            var discipline = await _context.Disciplines.FindAsync(id);
             if (discipline == null)
             {
                 return NotFound();
             }
 
-            _context.Discipline.Remove(discipline);
+            _context.Disciplines.Remove(discipline);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +117,7 @@ namespace UniversityScheduleSystem.Controllers
 
         private bool DisciplineExists(int id)
         {
-            return _context.Discipline.Any(e => e.Id == id);
+            return (_context.Disciplines?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

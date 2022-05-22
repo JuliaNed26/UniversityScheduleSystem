@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,16 +22,24 @@ namespace UniversityScheduleSystem.Controllers
 
         // GET: api/Teachings
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Teaching>>> GetTeaching()
+        public async Task<ActionResult<IEnumerable<Teaching>>> GetTeachings()
         {
-            return await _context.Teaching.ToListAsync();
+          if (_context.Teachings == null)
+          {
+              return NotFound();
+          }
+            return await _context.Teachings.ToListAsync();
         }
 
         // GET: api/Teachings/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Teaching>> GetTeaching(int id)
         {
-            var teaching = await _context.Teaching.FindAsync(id);
+          if (_context.Teachings == null)
+          {
+              return NotFound();
+          }
+            var teaching = await _context.Teachings.FindAsync(id);
 
             if (teaching == null)
             {
@@ -78,7 +85,11 @@ namespace UniversityScheduleSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Teaching>> PostTeaching(Teaching teaching)
         {
-            _context.Teaching.Add(teaching);
+          if (_context.Teachings == null)
+          {
+              return Problem("Entity set 'ScheduleSystemAPIContext.Teachings'  is null.");
+          }
+            _context.Teachings.Add(teaching);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetTeaching", new { id = teaching.Id }, teaching);
@@ -88,13 +99,17 @@ namespace UniversityScheduleSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTeaching(int id)
         {
-            var teaching = await _context.Teaching.FindAsync(id);
+            if (_context.Teachings == null)
+            {
+                return NotFound();
+            }
+            var teaching = await _context.Teachings.FindAsync(id);
             if (teaching == null)
             {
                 return NotFound();
             }
 
-            _context.Teaching.Remove(teaching);
+            _context.Teachings.Remove(teaching);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +117,7 @@ namespace UniversityScheduleSystem.Controllers
 
         private bool TeachingExists(int id)
         {
-            return _context.Teaching.Any(e => e.Id == id);
+            return (_context.Teachings?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

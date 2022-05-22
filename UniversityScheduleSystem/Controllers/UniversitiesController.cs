@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +24,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<University>>> GetUniversities()
         {
+          if (_context.Universities == null)
+          {
+              return NotFound();
+          }
             return await _context.Universities.ToListAsync();
         }
 
@@ -32,6 +35,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<University>> GetUniversity(int id)
         {
+          if (_context.Universities == null)
+          {
+              return NotFound();
+          }
             var university = await _context.Universities.FindAsync(id);
 
             if (university == null)
@@ -78,6 +85,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<University>> PostUniversity(University university)
         {
+          if (_context.Universities == null)
+          {
+              return Problem("Entity set 'ScheduleSystemAPIContext.Universities'  is null.");
+          }
             _context.Universities.Add(university);
             await _context.SaveChangesAsync();
 
@@ -88,6 +99,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUniversity(int id)
         {
+            if (_context.Universities == null)
+            {
+                return NotFound();
+            }
             var university = await _context.Universities.FindAsync(id);
             if (university == null)
             {
@@ -102,7 +117,7 @@ namespace UniversityScheduleSystem.Controllers
 
         private bool UniversityExists(int id)
         {
-            return _context.Universities.Any(e => e.Id == id);
+            return (_context.Universities?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UniversityScheduleSystem.Models;
+using UniversityScheduleSystem.Models.Dto;
 
 namespace UniversityScheduleSystem.Controllers
 {
@@ -23,23 +23,47 @@ namespace UniversityScheduleSystem.Controllers
 
         // GET: api/Cities
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<City>>> GetCity()
+        public async Task<ActionResult<IEnumerable<CityDto>>> GetCities()
         {
-            return await _context.City.ToListAsync();
+          if (_context.Cities == null)
+          {
+              return NotFound();
+          }
+
+            var cities = from city in _context.Cities
+                         select new CityDto()
+                         {
+                             Id = city.Id,
+                             Name = city.Name,
+                             RegionId = city.RegionId
+                         };
+
+            return await cities.ToListAsync();
         }
 
         // GET: api/Cities/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<City>> GetCity(int id)
+        public async Task<ActionResult<CityDto>> GetCity(int id)
         {
-            var city = await _context.City.FindAsync(id);
+          if (_context.Cities == null)
+          {
+              return NotFound();
+          }
+            var city = await _context.Cities.FindAsync(id);
 
             if (city == null)
             {
                 return NotFound();
             }
 
-            return city;
+            var response = new CityDto()
+            {
+                Id = city.Id,
+                Name = city.Name,
+                RegionId = city.RegionId
+            };
+
+            return response;
         }
 
         // PUT: api/Cities/5
@@ -78,23 +102,46 @@ namespace UniversityScheduleSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<City>> PostCity(City city)
         {
-            _context.City.Add(city);
+          if (_context.Cities == null)
+          {
+              return Problem("Entity set 'ScheduleSystemAPIContext.Cities'  is null.");
+          }
+
+            var newCity = new City()
+            {
+                Name = city.Name,
+                RegionId = city.RegionId,
+                Region = _context.Regions.Find(city.RegionId)
+            };
+
+            _context.Cities.Add(newCity);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCity", new { id = city.Id }, city);
+            var response = new CityDto()
+            {
+                Id = newCity.Id,
+                Name = newCity.Name,
+                RegionId = newCity.RegionId
+            };
+
+            return CreatedAtAction("GetCity", new { id = response.Id }, response);
         }
 
         // DELETE: api/Cities/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCity(int id)
         {
-            var city = await _context.City.FindAsync(id);
+            if (_context.Cities == null)
+            {
+                return NotFound();
+            }
+            var city = await _context.Cities.FindAsync(id);
             if (city == null)
             {
                 return NotFound();
             }
 
-            _context.City.Remove(city);
+            _context.Cities.Remove(city);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +149,7 @@ namespace UniversityScheduleSystem.Controllers
 
         private bool CityExists(int id)
         {
-            return _context.City.Any(e => e.Id == id);
+            return (_context.Cities?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

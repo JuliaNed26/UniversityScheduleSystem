@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +24,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Group>>> GetGroups()
         {
+          if (_context.Groups == null)
+          {
+              return NotFound();
+          }
             return await _context.Groups.ToListAsync();
         }
 
@@ -32,6 +35,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Group>> GetGroup(int id)
         {
+          if (_context.Groups == null)
+          {
+              return NotFound();
+          }
             var @group = await _context.Groups.FindAsync(id);
 
             if (@group == null)
@@ -78,6 +85,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Group>> PostGroup(Group @group)
         {
+          if (_context.Groups == null)
+          {
+              return Problem("Entity set 'ScheduleSystemAPIContext.Groups'  is null.");
+          }
             _context.Groups.Add(@group);
             await _context.SaveChangesAsync();
 
@@ -88,6 +99,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteGroup(int id)
         {
+            if (_context.Groups == null)
+            {
+                return NotFound();
+            }
             var @group = await _context.Groups.FindAsync(id);
             if (@group == null)
             {
@@ -102,7 +117,7 @@ namespace UniversityScheduleSystem.Controllers
 
         private bool GroupExists(int id)
         {
-            return _context.Groups.Any(e => e.Id == id);
+            return (_context.Groups?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

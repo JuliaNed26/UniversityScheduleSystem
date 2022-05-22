@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversityScheduleSystem", "UniversityScheduleSystem\UniversityScheduleSystem.csproj", "{C0196410-2838-4478-9577-D518E9D8F6AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversityScheduleSystem", "UniversityScheduleSystem\UniversityScheduleSystem.csproj", "{C0196410-2838-4478-9577-D518E9D8F6AD}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{798AF430-CFB8-463C-865B-9AB6B0483554}"
 EndProject

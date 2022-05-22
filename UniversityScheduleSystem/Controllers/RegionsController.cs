@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UniversityScheduleSystem.Models;
+using UniversityScheduleSystem.Models.Dto;
 
 namespace UniversityScheduleSystem.Controllers
 {
@@ -23,23 +23,45 @@ namespace UniversityScheduleSystem.Controllers
 
         // GET: api/Regions
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Region>>> GetRegion()
+        public async Task<ActionResult<IEnumerable<RegionDto>>> GetRegions()
         {
-            return await _context.Region.ToListAsync();
+          if (_context.Regions == null)
+          {
+              return NotFound();
+          }
+
+            var regions = from region in _context.Regions
+                          select new RegionDto()
+                          {
+                              Id = region.Id,
+                              Name = region.Name
+                          };
+
+            return await regions.ToListAsync();
         }
 
         // GET: api/Regions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Region>> GetRegion(int id)
+        public async Task<ActionResult<RegionDto>> GetRegion(int id)
         {
-            var region = await _context.Region.FindAsync(id);
+          if (_context.Regions == null)
+          {
+              return NotFound();
+          }
+            var region = await _context.Regions.FindAsync(id);
 
             if (region == null)
             {
                 return NotFound();
             }
 
-            return region;
+            var response = new RegionDto()
+            {
+                Id = region.Id,
+                Name = region.Name
+            };
+
+            return response;
         }
 
         // PUT: api/Regions/5
@@ -47,7 +69,7 @@ namespace UniversityScheduleSystem.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRegion(int id, Region region)
         {
-            if (id != region.ID)
+            if (id != region.Id)
             {
                 return BadRequest();
             }
@@ -76,25 +98,39 @@ namespace UniversityScheduleSystem.Controllers
         // POST: api/Regions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Region>> PostRegion(Region region)
+        public async Task<ActionResult<RegionDto>> PostRegion(Region region)
         {
-            _context.Region.Add(region);
+          if (_context.Regions == null)
+          {
+              return Problem("Entity set 'ScheduleSystemAPIContext.Regions'  is null.");
+          }
+            _context.Regions.Add(region);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRegion", new { id = region.ID }, region);
+            var response = new RegionDto()
+            {
+                Id = region.Id,
+                Name = region.Name
+            };
+
+            return CreatedAtAction("GetRegion", new { id = response.Id }, response);
         }
 
         // DELETE: api/Regions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRegion(int id)
         {
-            var region = await _context.Region.FindAsync(id);
+            if (_context.Regions == null)
+            {
+                return NotFound();
+            }
+            var region = await _context.Regions.FindAsync(id);
             if (region == null)
             {
                 return NotFound();
             }
 
-            _context.Region.Remove(region);
+            _context.Regions.Remove(region);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +138,7 @@ namespace UniversityScheduleSystem.Controllers
 
         private bool RegionExists(int id)
         {
-            return _context.Region.Any(e => e.ID == id);
+            return (_context.Regions?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

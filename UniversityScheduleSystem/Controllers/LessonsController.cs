@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,13 +18,16 @@ namespace UniversityScheduleSystem.Controllers
         public LessonsController(ScheduleSystemAPIContext context)
         {
             _context = context;
-            _context.SaveChanges();
         }
 
         // GET: api/Lessons
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Lesson>>> GetLessons()
         {
+          if (_context.Lessons == null)
+          {
+              return NotFound();
+          }
             return await _context.Lessons.ToListAsync();
         }
 
@@ -33,6 +35,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Lesson>> GetLesson(int id)
         {
+          if (_context.Lessons == null)
+          {
+              return NotFound();
+          }
             var lesson = await _context.Lessons.FindAsync(id);
 
             if (lesson == null)
@@ -79,6 +85,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpPost]
         public async Task<ActionResult<Lesson>> PostLesson(Lesson lesson)
         {
+          if (_context.Lessons == null)
+          {
+              return Problem("Entity set 'ScheduleSystemAPIContext.Lessons'  is null.");
+          }
             _context.Lessons.Add(lesson);
             await _context.SaveChangesAsync();
 
@@ -89,6 +99,10 @@ namespace UniversityScheduleSystem.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteLesson(int id)
         {
+            if (_context.Lessons == null)
+            {
+                return NotFound();
+            }
             var lesson = await _context.Lessons.FindAsync(id);
             if (lesson == null)
             {
@@ -103,7 +117,7 @@ namespace UniversityScheduleSystem.Controllers
 
         private bool LessonExists(int id)
         {
-            return _context.Lessons.Any(e => e.Id == id);
+            return (_context.Lessons?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }
